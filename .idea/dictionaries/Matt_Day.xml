@@ -4,6 +4,7 @@
       <w>gsap</w>
       <w>matcap</w>
       <w>metalness</w>
+      <w>raycaster</w>
     </words>
   </dictionary>
 </component>
