@@ -1,26 +1,16 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import * as dat from 'dat.gui'
-import { GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import * as dat from 'dat.gui'
 
 /**
  * Base
  */
 // Debug
-
-const parameters = {
-    animationIndex: 0,
-}
 const gui = new dat.GUI()
-gui.add(parameters, 'animationIndex').min(0).max(2).step(1).onChange(() => { remove(); loadModel(); });
 
-const remove = () => {
-    while(scene.children.length > 0){
-        scene.remove(scene.children[0]);
-    }
-}
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
 
@@ -30,64 +20,37 @@ const scene = new THREE.Scene()
 /**
  * Models
  */
-//DRACO models are almost half the size
-const dracoLoader = new DRACOLoader();
-const gltfLoader = new GLTFLoader();
+const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('/draco/')
-gltfLoader.setDRACOLoader(dracoLoader);
 
-let mixer = null;
-let action = null;
-let animations = null;
+const gltfLoader = new GLTFLoader()
+gltfLoader.setDRACOLoader(dracoLoader)
 
-const loadModel = () => {
-    gltfLoader.load(
-        '/models/Fox/glTF/Fox.gltf',
-        (gltf) => {
-            //animation mixer
-            mixer = new THREE.AnimationMixer(gltf.scene);
-            gltf.animations = animations;
-            action = mixer.clipAction(animations[parameters.animationIndex]);
+let mixer = null
 
-            action.play();
-
-            // while loop solution
-            // while(gltf.scene.children.length){
-            //     scene.add(gltf.scene.children[0])
-            // }
-
-            // duplicated array solution
-            // const children = [...gltf.scene.children]
-            // for(const child of children){
-            //     scene.add(child);
-            // }
-
-            // Simplest (loads everything in the scene though, maybe more than you need)
-            gltf.scene.scale.set(0.025,0.025,0.025);
-            scene.add(gltf.scene);
-        },
-    )
-}
-
-loadModel();
+gltfLoader.load(
+    '/models/hamburger.glb',
+    (gltf) =>
+    {
+        scene.add(gltf.scene)
+    }
+)
 
 /**
  * Floor
  */
-const floorGeometry = new THREE.PlaneGeometry(10, 10);
-const floorMaterial = new THREE.MeshStandardMaterial({
-    color: '#444444',
-    metalness: 0,
-    roughness: 0.5
-})
-
-const floor = new THREE.Mesh( floorGeometry, floorMaterial );
-
-
+const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(50, 50),
+    new THREE.MeshStandardMaterial({
+        color: '#444444',
+        metalness: 0,
+        roughness: 0.5
+    })
+)
 floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
+scene.add(floor)
 
-// scene.add(floor)
 /**
  * Lights
  */
@@ -133,12 +96,12 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(2, 2, 2)
+camera.position.set(- 8, 4, 8)
 scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
-controls.target.set(0, 0.75, 0)
+controls.target.set(0, 1, 0)
 controls.enableDamping = true
 
 /**
@@ -151,7 +114,7 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.setClearColor('#ffffff')
+
 /**
  * Animate
  */
@@ -164,8 +127,10 @@ const tick = () =>
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
 
-    //update mixer
-    if(mixer !== null) mixer.update(deltaTime);
+    if(mixer)
+    {
+        mixer.update(deltaTime)
+    }
 
     // Update controls
     controls.update()
