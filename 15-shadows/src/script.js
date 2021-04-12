@@ -89,7 +89,17 @@ const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 32, 32),
     material
 )
-sphere.castShadow = true
+const sphere2 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 32, 32),
+    material
+)
+sphere2.scale.x = 0.25;
+sphere2.scale.y = 0.25;
+sphere2.scale.z = 0.25;
+const sphere3 = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 32, 32),
+    material
+)
 
 const plane = new THREE.Mesh(
     new THREE.PlaneGeometry(5, 5),
@@ -107,12 +117,32 @@ const sphereShadow = new THREE.Mesh(
         alphaMap: simpleShadow,
     })
 )
+const sphereShadow2 = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.5, 1.5),
+    new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        transparent: true,
+        alphaMap: simpleShadow,
+    })
+)
+const sphereShadow3 = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.5, 1.5),
+    new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        transparent: true,
+        alphaMap: simpleShadow,
+    })
+)
 
 sphereShadow.rotation.x = - Math.PI * 0.5;
 sphereShadow.position.y = plane.position.y + 0.01
+sphereShadow2.rotation.x = - Math.PI * 0.5;
+sphereShadow2.position.y = plane.position.y + 0.01
+sphereShadow3.rotation.x = - Math.PI * 0.5;
+sphereShadow3.position.y = plane.position.y + 0.01
 
 
-scene.add(sphere, plane, sphereShadow)
+scene.add(sphere, sphere2,  plane, sphereShadow, sphereShadow2,)
 
 gui.add(sphere.position, 'x').min(- 5).max(5).step(0.001).onChange()
 gui.add(sphere.position, 'y').min(- 5).max(5).step(0.001)
@@ -179,9 +209,25 @@ const tick = () =>
     sphere.position.z = Math.sin(elapsedTime) * 1.5;
     sphere.position.y = Math.abs(Math.sin(elapsedTime * 3));
 
+    sphere2.position.x = Math.cos(elapsedTime) * 1.5;
+    sphere2.position.z = Math.sin(elapsedTime) * 1.5;
+    sphere2.position.y = Math.abs(Math.sin(elapsedTime * 0.5));
+
+    // sphere3.position.x = Math.cos(elapsedTime) * 1.5;
+    // sphere3.position.z = Math.sin(elapsedTime) * 3;
+    // sphere3.position.y = Math.abs(Math.sin(elapsedTime * 3));
+
     sphereShadow.position.x = sphere.position.x;
     sphereShadow.position.z = sphere.position.z;
     sphereShadow.material.opacity = (1 - sphere.position.y) * 0.5
+
+    sphereShadow2.position.x = sphere2.position.x;
+    sphereShadow2.position.z = sphere2.position.z;
+    sphereShadow2.material.opacity = (1 - sphere2.position.y) * 0.5
+
+    // sphereShadow3.position.x = sphere3.position.x;
+    // sphereShadow3.position.z = sphere3.position.z;
+    // sphereShadow3.material.opacity = (1 - sphere3.position.y) * 0.5
 
     // Update controls
     controls.update()
